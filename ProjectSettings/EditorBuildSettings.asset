@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/TicTakToe/TicTakToe.unity
+    guid: 50b3d81c6fb437f4a891983b8949253c
   m_configObjects: {}

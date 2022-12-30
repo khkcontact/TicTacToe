@@ -102,26 +102,33 @@ namespace TicTacToe
                 SmartComputerTurn();
                 //StartCoroutine(RandomComputerTurn());
             }
+
+            if (CheckWinner(CellContent.ComputerTurnMark))
+                OnGameEnd(CellContent.ComputerTurnMark);
         }
 
         void SmartComputerTurn()
         {
+            Debug.Log("called TikTacToeGame::SmartComputerTurn()");
             if (!CheckFreeCell())
             {
                 OnGameEnd(CellContent.Empty);
                 return;
             }
-           
-            ai.Reset(PrepareBoardData());
+
+            //ai.Reset(PrepareBoardData());
+            Vector2Int selected = ai.GetComputerMove(PrepareBoardData());
+            Debug.Log($" TikTacToeGame::SmartComputerTurn selected cell {selected}");
+            cells[selected.x, selected.y].SetComputerTurnMark();
         }
 
         CellContent[,] board = new CellContent[GridSize, GridSize];
         CellContent[,]  PrepareBoardData()
         {
             Debug.Log("TikTacToeGame::PrepareBoardData() called ");
-            for (int row = 1; row < GridSize; row++)
+            for (int row = 0; row < GridSize; row++)
             {
-                for (int col = 1; col < GridSize; col++)
+                for (int col = 0; col < GridSize; col++)
                     board[row, col] = cells[row, col].ContentId;
             }
             return board;

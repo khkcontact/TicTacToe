@@ -37,6 +37,7 @@ namespace TicTacToe
         public CellContent ContentId { get => _contentId; }
         public void SetComputerTurnMark()
         {
+            Debug.Log($"called SetComputerTurnMark for cell ({Row},{Column}) ");
             if (ContentId != CellContent.Empty)
                 Debug.LogError($"Cell {Row}, {Column} is already contains {ContentId}");
             else
