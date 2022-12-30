@@ -5,6 +5,13 @@ using UnityEngine;
 using TicTacToeAI;
 namespace TicTacToe
 {
+
+    [System.Serializable]
+    public class ComplexitySettings
+    {
+        public Complexity Id;
+        public float probability;
+    }
     public class TikTacToeGame : MonoBehaviour
     {
        /// <summary>
@@ -16,12 +23,41 @@ namespace TicTacToe
 
         [SerializeField]
         VictoryPanel victoryPanel;
-        
+
+        [SerializeField]
+        ComplexityPanel complexitySelection;
+
         Cell[,] cells = new Cell[GridSize, GridSize];
 
         public bool IsRunning { get; private set; }
 
         TicTacToeAIObject ai = new TicTacToeAIObject();
+
+        //Provide to players the chance to win:
+        // it is impossible when used minimax algorithm
+        // So this is the probability of using random turn instead of AI
+        [Header("Setup provability in percents")]
+        [SerializeField]
+        List<ComplexitySettings> settings;
+        bool RollDice()
+        {
+            var res=settings.Find(el=> el.Id == currentComplexity);
+            if (res == null)
+                return false;
+            float randomVal = Random.Range(0, 100);
+            bool ret = randomVal < res.probability;
+            Debug.Log($"TikTacToeGame::RollDice() Rolled dice for {currentComplexity} probability {res.probability}, random {randomVal} returns {ret} ");
+            return ret;
+        }
+
+
+        [SerializeField]
+        Complexity currentComplexity = Complexity.Easy;
+
+        public void SetComplexity(Complexity newComplexity)
+        {
+            currentComplexity = newComplexity;
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -40,7 +76,7 @@ namespace TicTacToe
             foreach (Transform row in tableRoot)
             {
                
-                Debug.Log($"row index = {rowIndex} ");
+               // Debug.Log($"row index = {rowIndex} ");
                 
                 row.GetComponentsInChildren<Cell>(cellsOfRow);
                 for (int i = 0; i < GridSize; i++)
@@ -52,11 +88,20 @@ namespace TicTacToe
             }
 
             IsRunning = true;
+            complexitySelection.Initialize(this, OnComplexityClosed);
+            AskComplexity();
            // printCells();
+        }
+
+
+        void OnComplexityClosed() 
+        {
+            Debug.Log("OnComplexityClosed called");
         }
 
         public void Restart()
         {
+            AskComplexity();
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
@@ -66,6 +111,12 @@ namespace TicTacToe
             }
             IsRunning = true;
         }
+
+        void AskComplexity()
+        {
+            complexitySelection.Show();
+        }
+
         /// <summary>
         /// for debug purposes
         /// </summary>
@@ -99,7 +150,13 @@ namespace TicTacToe
                     OnGameEnd(CellContent.Empty);
                     return;
                 }
-                SmartComputerTurn();
+
+                if (RollDice())
+                    StartCoroutine(RandomComputerTurn());
+                else
+                    SmartComputerTurn();
+
+                //SmartComputerTurn();
                 //StartCoroutine(RandomComputerTurn());
             }
 

@@ -127,7 +127,7 @@ namespace TicTacToeAI
             }
             if (isDiagonLTRBWin)
             {
-                Debug.Log($"IsWin: win diagon1");
+               // Debug.Log($"IsWin: win diagon1");
                 return true;
             }
 
